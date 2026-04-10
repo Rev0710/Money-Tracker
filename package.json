@@ -1,0 +1,16 @@
+{
+  "name": "moneytracker",
+  "version": "1.0.0",
+  "description": "MoneyTracker - MERN Stack Full-Stack Finance App",
+  "scripts": {
+    "install-all": "npm install && cd backend && npm install && cd ../frontend && npm install",
+    "dev": "concurrently \"npm run server\" \"npm run client\"",
+    "server": "cd backend && npm run dev",
+    "client": "cd frontend && npm start",
+    "build": "cd frontend && npm run build",
+    "start": "cd backend && npm start"
+  },
+  "dependencies": {
+    "concurrently": "^8.2.0"
+  }
+}
