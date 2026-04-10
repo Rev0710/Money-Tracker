@@ -1,8 +1,8 @@
 import axios from 'axios';
 
-const BACKEND_URL = 'https://money-tracker-n1vp.onrender.com';
-
-const api = axios.create({ baseURL: `${BACKEND_URL}/api` });
+const api = axios.create({ 
+  baseURL: 'https://money-tracker-n1vp.onrender.com/api'
+});
 
 api.interceptors.request.use((config) => {
   const token = localStorage.getItem('token');
