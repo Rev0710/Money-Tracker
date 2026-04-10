@@ -6,17 +6,17 @@ const dotenv = require('dotenv');
 dotenv.config();
 
 const app = express();
+
 app.use(cors({
   origin: [
     'http://localhost:3000',
-    'https://money-tracker-ashy-six.vercel.app/'
+    'https://money-tracker-ashy-six.vercel.app'
   ],
   credentials: true
 }));
 
 app.use(express.json());
 
-// Routes
 app.use('/api/auth', require('./routes/auth'));
 app.use('/api/transactions', require('./routes/transactions'));
 app.use('/api/budgets', require('./routes/budgets'));
@@ -38,10 +38,10 @@ mongoose.connect(process.env.MONGO_URI)
   .then(() => {
     console.log('✅ MongoDB Atlas connected successfully');
     app.listen(PORT, () => {
-      console.log(`Server running on port ${PORT}`);
+      console.log(`🚀 Server running on port ${PORT}`);
     });
   })
   .catch((err) => {
-    console.error('MongoDB connection error:', err.message);
+    console.error('❌ MongoDB connection error:', err.message);
     process.exit(1);
   });
