@@ -1,8 +1,22 @@
 {
-  "rewrites": [
+  "version": 2,
+  "builds": [
     {
-      "source": "/api/:path*",
-      "destination": "https://money-tracker-n1vp.onrender.com/api/:path*"
+      "src": "frontend/package.json",
+      "use": "@vercel/static-build",
+      "config": {
+        "distDir": "build"
+      }
+    }
+  ],
+  "routes": [
+    {
+      "src": "/api/(.*)",
+      "dest": "https://money-tracker-n1vp.onrender.com/api/$1"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "/frontend/build/$1"
     }
   ]
 }

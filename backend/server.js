@@ -10,7 +10,8 @@ const app = express();
 app.use(cors({
   origin: [
     'http://localhost:3000',
-    'https://money-tracker-ashy-six.vercel.app'
+    'https://money-tracker-ashy-six.vercel.app',
+    /\.vercel\.app$/
   ],
   credentials: true
 }));
