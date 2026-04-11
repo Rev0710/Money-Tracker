@@ -8,12 +8,8 @@ dotenv.config();
 const app = express();
 
 app.use(cors({
-  origin: [
-    'http://localhost:3000',
-    'https://money-tracker-ashy-six.vercel.app',
-    'https://money-tracker-app-navy.vercel.app'
-  ],
-  credentials: true
+  origin: '*',
+  credentials: false
 }));
 
 app.use(express.json());
