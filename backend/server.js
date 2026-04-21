@@ -7,12 +7,15 @@ dotenv.config();
 
 const app = express();
 
-// Middleware
+// --- FIXED MIDDLEWARE ---
 app.use(cors({
-  origin: ["http://localhost:3000", "https://money-tracker-jade-one.vercel.app/"], // Add your frontend URLs here
-  methods: ["GET", "POST", "PUT", "DELETE"],
-  allowedHeaders: ["Content-Type", "Authorization"]
+  // REMOVED the trailing slash from the Vercel URL
+  origin: ["http://localhost:3000", "https://money-tracker-jade-one.vercel.app"], 
+  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"], // Added OPTIONS for preflight
+  allowedHeaders: ["Content-Type", "Authorization"],
+  credentials: true
 }));
+
 app.use(express.json());
 
 // Routes
@@ -33,18 +36,15 @@ app.use((err, req, res, next) => {
 });
 
 // MongoDB Connection Logic
-// We don't "await" the connection here so the app can export immediately
 mongoose.connect(process.env.MONGO_URI)
   .then(() => console.log('✅ MongoDB Atlas connected successfully'))
   .catch((err) => console.error('❌ MongoDB connection error:', err.message));
 
-// Handle local development vs Vercel deployment
-if (process.env.NODE_ENV !== 'production') {
-  const PORT = process.env.PORT || 5000;
-  app.listen(PORT, () => {
-    console.log(`🚀 Local server running on port ${PORT}`);
-  });
-}
+// Port Logic - Optimized for Render
+const PORT = process.env.PORT || 5000;
+app.listen(PORT, '0.0.0.0', () => {
+  console.log(`🚀 Server is listening on port ${PORT}`);
+});
 
-// CRITICAL: Export for Vercel
+// Export for Vercel (if you decide to move backend to Vercel later)
 module.exports = app;
