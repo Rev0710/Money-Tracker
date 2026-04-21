@@ -9,8 +9,9 @@ const app = express();
 
 // Middleware
 app.use(cors({
-  origin: '*',
-  credentials: false
+  origin: ["http://localhost:3000", "https://your-vercel-domain.vercel.app"], // Add your frontend URLs here
+  methods: ["GET", "POST", "PUT", "DELETE"],
+  allowedHeaders: ["Content-Type", "Authorization"]
 }));
 app.use(express.json());
 
