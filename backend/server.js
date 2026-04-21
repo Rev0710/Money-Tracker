@@ -9,7 +9,7 @@ const app = express();
 
 // Middleware
 app.use(cors({
-  origin: ["http://localhost:3000", "https://your-vercel-domain.vercel.app"], // Add your frontend URLs here
+  origin: ["http://localhost:3000", "https://money-tracker-jade-one.vercel.app/"], // Add your frontend URLs here
   methods: ["GET", "POST", "PUT", "DELETE"],
   allowedHeaders: ["Content-Type", "Authorization"]
 }));
