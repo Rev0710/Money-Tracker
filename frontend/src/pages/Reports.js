@@ -30,8 +30,10 @@ export default function Reports({ month, year }) {
         getSummary(month, year),
         getTransactions({ month, year, limit: 100 })
       ]);
-      setSummary(sumRes.data);
-      setAllTx(txRes.data.transactions);
+      const nextSummary = sumRes?.data?.data || sumRes?.data;
+      const nextTx = txRes?.data?.data || txRes?.data;
+      setSummary(nextSummary || null);
+      setAllTx(Array.isArray(nextTx?.transactions) ? nextTx.transactions : []);
     } catch (e) { console.error(e); }
     finally { setLoading(false); }
   }, [month, year]);
@@ -41,18 +43,20 @@ export default function Reports({ month, year }) {
   if (loading) return <div className="loading-spinner"><div className="spinner"></div></div>;
   if (!summary) return null;
 
-  const spendingTotal = summary.spendingByCategory.reduce((a, b) => a + b.total, 0);
+  const spendingByCategory = Array.isArray(summary.spendingByCategory) ? summary.spendingByCategory : [];
+  const spendingTotal = spendingByCategory.reduce((a, b) => a + Number(b.total || 0), 0);
 
   // Daily spending data for line chart
   const dailyMap = {};
-  allTx.filter(t => t.type === 'expense').forEach(t => {
+  (Array.isArray(allTx) ? allTx : []).filter(t => t.type === 'expense').forEach(t => {
     const d = new Date(t.date).getDate();
     dailyMap[d] = (dailyMap[d] || 0) + t.amount;
   });
   const dailyData = Object.entries(dailyMap).sort((a, b) => a[0] - b[0]).map(([day, amount]) => ({ day: `Day ${day}`, amount }));
 
-  const incomeTransactions = allTx.filter(t => t.type === 'income');
-  const expenseTransactions = allTx.filter(t => t.type === 'expense');
+  const safeAllTx = Array.isArray(allTx) ? allTx : [];
+  const incomeTransactions = safeAllTx.filter(t => t.type === 'income');
+  const expenseTransactions = safeAllTx.filter(t => t.type === 'expense');
 
   return (
     <div className="reports-page">
@@ -110,15 +114,15 @@ export default function Reports({ month, year }) {
             <>
               <ResponsiveContainer width="100%" height={200}>
                 <PieChart>
-                  <Pie data={summary.spendingByCategory.map(s => ({ name: s._id, value: s.total }))}
+                  <Pie data={spendingByCategory.map(s => ({ name: s._id, value: s.total }))}
                     cx="50%" cy="50%" outerRadius={80} dataKey="value" paddingAngle={2}>
-                    {summary.spendingByCategory.map((_, i) => <Cell key={i} fill={COLORS[i % COLORS.length]} />)}
+                    {spendingByCategory.map((_, i) => <Cell key={i} fill={COLORS[i % COLORS.length]} />)}
                   </Pie>
                   <Tooltip formatter={(v) => fmt(v)} />
                 </PieChart>
               </ResponsiveContainer>
               <div className="pie-legend">
-                {summary.spendingByCategory.map((s, i) => (
+                {spendingByCategory.map((s, i) => (
                   <div key={i} className="pie-legend-item">
                     <div style={{ width: 10, height: 10, borderRadius: '50%', background: COLORS[i % COLORS.length], flexShrink: 0 }}></div>
                     <span style={{ flex: 1, fontSize: '13px', color: 'var(--text-secondary)' }}>{s._id}</span>

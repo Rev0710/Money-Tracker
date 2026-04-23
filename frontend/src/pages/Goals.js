@@ -20,7 +20,11 @@ export default function Goals() {
 
   const fetchGoals = async () => {
     setLoading(true);
-    try { const { data } = await getGoals(); setGoals(data); }
+    try {
+      const { data } = await getGoals();
+      const next = Array.isArray(data) ? data : (data?.goals || data?.data || []);
+      setGoals(Array.isArray(next) ? next : []);
+    }
     catch (e) { console.error(e); }
     finally { setLoading(false); }
   };
@@ -63,9 +67,10 @@ export default function Goals() {
     } catch (e) { console.error(e); }
   };
 
-  const totalSaved = goals.reduce((a, b) => a + b.currentAmount, 0);
-  const totalTarget = goals.reduce((a, b) => a + b.targetAmount, 0);
-  const completed = goals.filter(g => g.currentAmount >= g.targetAmount).length;
+  const safeGoals = Array.isArray(goals) ? goals : [];
+  const totalSaved = safeGoals.reduce((a, b) => a + Number(b.currentAmount || 0), 0);
+  const totalTarget = safeGoals.reduce((a, b) => a + Number(b.targetAmount || 0), 0);
+  const completed = safeGoals.filter(g => Number(g.currentAmount || 0) >= Number(g.targetAmount || 0)).length;
 
   return (
     <div className="goals-page">
@@ -86,7 +91,7 @@ export default function Goals() {
           { label: 'Total Saved', value: fmt(totalSaved), icon: '💰', color: '#2ecc71' },
           { label: 'Total Target', value: fmt(totalTarget), icon: '🎯', color: '#6c63ff' },
           { label: 'Goals Completed', value: completed, icon: '🏆', color: '#f39c12' },
-          { label: 'Active Goals', value: goals.filter(g => g.status === 'active').length, icon: '⚡', color: '#4ecdc4' },
+          { label: 'Active Goals', value: safeGoals.filter(g => g.status === 'active').length, icon: '⚡', color: '#4ecdc4' },
         ].map((s, i) => (
           <div key={i} className="goal-summary-card card">
             <div className="goal-summary-icon" style={{ fontSize: '24px' }}>{s.icon}</div>
@@ -100,7 +105,7 @@ export default function Goals() {
 
       {loading ? (
         <div className="loading-spinner"><div className="spinner"></div></div>
-      ) : goals.length === 0 ? (
+      ) : safeGoals.length === 0 ? (
         <div className="card" style={{ padding: '60px', textAlign: 'center' }}>
           <div style={{ fontSize: '52px', marginBottom: '16px' }}>🎯</div>
           <h3 style={{ color: 'var(--text-secondary)', marginBottom: '8px' }}>No goals yet</h3>
@@ -109,7 +114,7 @@ export default function Goals() {
         </div>
       ) : (
         <div className="goals-grid">
-          {goals.map((goal) => {
+          {safeGoals.map((goal) => {
             const pct = Math.min((goal.currentAmount / goal.targetAmount) * 100, 100);
             const isComplete = goal.currentAmount >= goal.targetAmount;
             const barColor = isComplete ? '#2ecc71' : pct > 70 ? '#f39c12' : '#6c63ff';

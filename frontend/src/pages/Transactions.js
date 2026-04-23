@@ -25,8 +25,10 @@ export default function Transactions({ month, year }) {
     setLoading(true);
     try {
       const { data } = await getTransactions({ month, year, type: filterType, category: filterCategory, page, limit: 15 });
-      setTransactions(data.transactions);
-      setTotal(data.total);
+      const tx = Array.isArray(data?.transactions) ? data.transactions : (Array.isArray(data) ? data : (data?.data?.transactions || []));
+      const totalVal = Number.isFinite(data?.total) ? data.total : Number(data?.data?.total || 0);
+      setTransactions(Array.isArray(tx) ? tx : []);
+      setTotal(Number.isFinite(totalVal) ? totalVal : 0);
     } catch (e) { console.error(e); }
     finally { setLoading(false); }
   }, [month, year, filterType, filterCategory, page]);

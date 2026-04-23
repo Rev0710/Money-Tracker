@@ -13,8 +13,9 @@
   border-radius: var(--radius-lg);
   padding: 20px;
   transition: all 0.2s ease;
+  box-shadow: var(--shadow-sm);
 }
-.stat-card:hover { border-color: rgba(108,99,255,0.3); transform: translateY(-2px); box-shadow: var(--shadow-md); }
+.stat-card:hover { border-color: rgba(108,99,255,0.22); transform: translateY(-2px); box-shadow: var(--shadow-md); }
 
 .stat-card-top { display: flex; align-items: flex-start; justify-content: space-between; }
 .stat-label { font-size: 13px; color: var(--text-secondary); font-weight: 500; margin-bottom: 6px; }
@@ -26,13 +27,15 @@
 
 .dashboard-grid {
   display: grid;
-  grid-template-columns: 1.2fr 0.8fr 1fr;
+  grid-template-columns: 1.35fr 1.05fr 0.9fr;
   grid-template-rows: auto auto;
   gap: 16px;
+  align-items: start;
 }
 
 .spending-card { grid-column: 1; grid-row: 1; }
-.cashflow-card { grid-column: 2 / 4; grid-row: 1; }
+.cashflow-card { grid-column: 2; grid-row: 1; }
+.budgets-card { grid-column: 3; grid-row: 1; }
 .transactions-card { grid-column: 1; grid-row: 2; }
 .goals-card { grid-column: 2; grid-row: 2; }
 .insights-card { grid-column: 3; grid-row: 2; }
@@ -72,6 +75,7 @@
   border-radius: var(--radius-sm);
   padding: 10px 14px;
   font-size: 13px;
+  box-shadow: var(--shadow-md);
 }
 .chart-tooltip-label { font-weight: 700; color: var(--text-primary); margin-bottom: 6px; }
 
@@ -82,7 +86,7 @@
 .tx-list { display: flex; flex-direction: column; gap: 4px; }
 .tx-item {
   display: flex; align-items: center; gap: 12px;
-  padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,0.04);
+  padding: 10px 0; border-bottom: 1px solid rgba(15, 23, 42, 0.06);
 }
 .tx-item:last-child { border-bottom: none; }
 .tx-icon { font-size: 20px; width: 36px; height: 36px; background: var(--bg-input); border-radius: 8px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
@@ -108,6 +112,42 @@
 .insight-icon { width: 36px; height: 36px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 16px; flex-shrink: 0; }
 .insight-text { font-size: 13px; color: var(--text-secondary); line-height: 1.5; padding-top: 8px; }
 
+.budgets-list { display: flex; flex-direction: column; gap: 12px; }
+.budget-row { display: flex; gap: 10px; align-items: flex-start; }
+.budget-icon {
+  width: 34px;
+  height: 34px;
+  border-radius: 10px;
+  background: var(--bg-input);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  flex-shrink: 0;
+}
+.budget-main { flex: 1; min-width: 0; }
+.budget-top { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+.budget-name { font-size: 13px; font-weight: 700; color: var(--text-primary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.budget-pct { font-size: 12px; font-weight: 800; color: var(--text-secondary); }
+.budget-meta { display: flex; align-items: baseline; gap: 6px; margin-top: 2px; }
+.budget-amount { font-size: 12px; font-weight: 700; color: var(--text-primary); }
+.budget-muted { font-size: 12px; color: var(--text-muted); font-weight: 600; }
+.budget-bar {
+  height: 8px;
+  background: rgba(148, 163, 184, 0.25);
+  border-radius: 999px;
+  overflow: hidden;
+  margin-top: 8px;
+}
+.budget-bar-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--accent-primary), #8b5cf6);
+  border-radius: 999px;
+  transition: width 0.6s ease;
+}
+.budget-bar-fill.warn { background: linear-gradient(90deg, #f59e0b, #fb7185); }
+.budget-bar-fill.danger { background: linear-gradient(90deg, #ef4444, #fb7185); }
+
 .empty-state { display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 20px; text-align: center; }
 .empty-icon { font-size: 32px; }
 .empty-state p { font-size: 14px; color: var(--text-muted); }
@@ -115,7 +155,7 @@
 @media (max-width: 1200px) {
   .stats-grid { grid-template-columns: repeat(2, 1fr); }
   .dashboard-grid { grid-template-columns: 1fr 1fr; }
-  .spending-card, .cashflow-card, .transactions-card, .goals-card, .insights-card {
+  .spending-card, .cashflow-card, .budgets-card, .transactions-card, .goals-card, .insights-card {
     grid-column: auto; grid-row: auto;
   }
 }

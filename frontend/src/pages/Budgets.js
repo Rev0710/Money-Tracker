@@ -7,6 +7,15 @@ const CATEGORY_ICONS = { Housing:'🏠',Food:'🍔',Transport:'🚗',Entertainme
 const fmt = (v) => `$${Number(v).toLocaleString('en-US', { minimumFractionDigits: 0 })}`;
 
 const EMPTY_FORM = { category: 'Food', limit: '' };
+const extractBudgets = (payload) => {
+  if (Array.isArray(payload)) return payload;
+  if (Array.isArray(payload?.budgets)) return payload.budgets;
+  if (Array.isArray(payload?.data)) return payload.data;
+  if (Array.isArray(payload?.data?.budgets)) return payload.data.budgets;
+  if (Array.isArray(payload?.result)) return payload.result;
+  if (Array.isArray(payload?.result?.budgets)) return payload.result.budgets;
+  return [];
+};
 
 export default function Budgets({ month, year }) {
   const [budgets, setBudgets] = useState([]);
@@ -20,22 +29,54 @@ export default function Budgets({ month, year }) {
     setLoading(true);
     try {
       const { data } = await getBudgets(month, year);
-      setBudgets(data);
-    } catch (e) { console.error(e); }
+      setBudgets(extractBudgets(data));
+    } catch (e) {
+      console.error(e);
+      setBudgets([]);
+      setError(e?.response?.data?.message || 'Failed to load budgets');
+    }
     finally { setLoading(false); }
   }, [month, year]);
 
   useEffect(() => { fetchBudgets(); }, [fetchBudgets]);
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+  const handleSubmit = async () => {
     setError('');
     setSubmitting(true);
     try {
-      await createBudget({ ...form, month, year });
+      const payload = {
+        category: form.category,
+        limit: Number(form.limit),
+        month: Number(month),
+        year: Number(year),
+      };
+      if (!payload.limit || payload.limit <= 0) {
+        setError('Please enter a valid monthly limit.');
+        return;
+      }
+      const res = await createBudget(payload);
+      const saved = res?.data?.data || res?.data;
+      if (saved && saved.category) {
+        // Optimistic local update so user sees it instantly.
+        setBudgets((prev) => {
+          const prevList = Array.isArray(prev) ? prev : [];
+          const idx = prevList.findIndex(
+            (b) =>
+              b.category === saved.category &&
+              Number(b.month) === Number(saved.month ?? payload.month) &&
+              Number(b.year) === Number(saved.year ?? payload.year)
+          );
+          if (idx >= 0) {
+            const next = [...prevList];
+            next[idx] = { ...next[idx], ...saved };
+            return next;
+          }
+          return [...prevList, saved];
+        });
+      }
       setShowModal(false);
       setForm(EMPTY_FORM);
-      fetchBudgets();
+      await fetchBudgets();
     } catch (err) {
       setError(err.response?.data?.message || 'Error saving budget');
     } finally { setSubmitting(false); }
@@ -46,9 +87,10 @@ export default function Budgets({ month, year }) {
     try { await deleteBudget(id); fetchBudgets(); } catch (e) { console.error(e); }
   };
 
-  const totalBudget = budgets.reduce((a, b) => a + b.limit, 0);
-  const totalSpent = budgets.reduce((a, b) => a + (b.spent || 0), 0);
-  const overBudgetCount = budgets.filter(b => (b.spent || 0) > b.limit).length;
+  const safeBudgets = Array.isArray(budgets) ? budgets : [];
+  const totalBudget = safeBudgets.reduce((a, b) => a + Number(b.limit || 0), 0);
+  const totalSpent = safeBudgets.reduce((a, b) => a + Number(b.spent || 0), 0);
+  const overBudgetCount = safeBudgets.filter(b => Number(b.spent || 0) > Number(b.limit || 0)).length;
 
   return (
     <div className="budgets-page">
@@ -68,7 +110,7 @@ export default function Budgets({ month, year }) {
         <div className="budget-summary-card">
           <p className="budget-summary-label">Total Budget</p>
           <h3 className="budget-summary-value">{fmt(totalBudget)}</h3>
-          <p className="budget-summary-sub">across {budgets.length} categories</p>
+          <p className="budget-summary-sub">across {safeBudgets.length} categories</p>
         </div>
         <div className="budget-summary-card">
           <p className="budget-summary-label">Total Spent</p>
@@ -89,7 +131,7 @@ export default function Budgets({ month, year }) {
 
       {loading ? (
         <div className="loading-spinner"><div className="spinner"></div></div>
-      ) : budgets.length === 0 ? (
+      ) : safeBudgets.length === 0 ? (
         <div className="card" style={{ padding: '60px', textAlign: 'center' }}>
           <div style={{ fontSize: '52px', marginBottom: '16px' }}>📊</div>
           <h3 style={{ color: 'var(--text-secondary)', marginBottom: '8px' }}>No budgets set</h3>
@@ -98,7 +140,7 @@ export default function Budgets({ month, year }) {
         </div>
       ) : (
         <div className="budgets-grid">
-          {budgets.map((budget) => {
+          {safeBudgets.map((budget) => {
             const spent = budget.spent || 0;
             const pct = Math.min((spent / budget.limit) * 100, 100);
             const isOver = spent > budget.limit;
@@ -143,7 +185,13 @@ export default function Budgets({ month, year }) {
               <button className="modal-close" onClick={() => setShowModal(false)}>×</button>
             </div>
             {error && <div className="alert alert-error">{error}</div>}
-            <form onSubmit={handleSubmit}>
+            <form
+              noValidate
+              onSubmit={(e) => {
+                e.preventDefault();
+                handleSubmit();
+              }}
+            >
               <div className="form-group">
                 <label>Category</label>
                 <select value={form.category} onChange={e => setForm({ ...form, category: e.target.value })}>
@@ -157,7 +205,12 @@ export default function Budgets({ month, year }) {
               </div>
               <div className="modal-actions">
                 <button type="button" className="btn btn-secondary" onClick={() => setShowModal(false)}>Cancel</button>
-                <button type="submit" className="btn btn-primary" disabled={submitting}>
+                <button
+                  type="button"
+                  className="btn btn-primary"
+                  disabled={submitting}
+                  onClick={handleSubmit}
+                >
                   {submitting ? <><span className="btn-spinner"></span>Saving...</> : 'Save Budget'}
                 </button>
               </div>

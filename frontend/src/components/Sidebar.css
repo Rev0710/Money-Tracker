@@ -4,8 +4,9 @@
   left: 0;
   width: var(--sidebar-width);
   height: 100vh;
-  background: var(--bg-secondary);
-  border-right: 1px solid var(--border-color);
+  /* Keep sidebar dark like reference */
+  background: #0f172a;
+  border-right: 1px solid rgba(255,255,255,0.08);
   display: flex;
   flex-direction: column;
   z-index: 100;
@@ -17,7 +18,7 @@
   align-items: center;
   gap: 12px;
   padding: 20px 18px;
-  border-bottom: 1px solid var(--border-color);
+  border-bottom: 1px solid rgba(255,255,255,0.08);
   text-decoration: none;
 }
 
@@ -37,13 +38,13 @@
   font-family: var(--font-display);
   font-size: 15px;
   font-weight: 700;
-  color: var(--text-primary);
+  color: rgba(255,255,255,0.92);
   letter-spacing: -0.01em;
 }
 
 .sidebar-brand-tag {
   font-size: 10px;
-  color: var(--text-muted);
+  color: rgba(255,255,255,0.58);
   letter-spacing: 0.05em;
   margin-top: 1px;
 }
@@ -59,7 +60,7 @@
 .sidebar-nav > .sidebar-nav-label {
   font-size: 10px;
   font-weight: 700;
-  color: var(--text-muted);
+  color: rgba(255,255,255,0.52);
   text-transform: uppercase;
   letter-spacing: 0.1em;
   padding: 8px 8px 6px;
@@ -72,7 +73,7 @@
   gap: 12px;
   padding: 10px 12px;
   border-radius: var(--radius-sm);
-  color: var(--text-secondary);
+  color: rgba(255,255,255,0.72);
   text-decoration: none;
   font-size: 14px;
   font-weight: 500;
@@ -82,14 +83,14 @@
 }
 
 .sidebar-nav-item:hover {
-  color: var(--text-primary);
-  background: rgba(255, 255, 255, 0.04);
+  color: rgba(255,255,255,0.92);
+  background: rgba(255,255,255,0.06);
 }
 
 .sidebar-nav-item.active {
   color: var(--accent-primary);
-  background: rgba(108, 99, 255, 0.12);
-  border-color: rgba(108, 99, 255, 0.2);
+  background: rgba(108, 99, 255, 0.16);
+  border-color: rgba(108, 99, 255, 0.22);
   font-weight: 600;
 }
 
@@ -110,7 +111,7 @@
 
 .sidebar-footer {
   padding: 12px;
-  border-top: 1px solid var(--border-color);
+  border-top: 1px solid rgba(255,255,255,0.08);
   display: flex;
   flex-direction: column;
   gap: 10px;
@@ -121,8 +122,8 @@
   align-items: center;
   gap: 10px;
   padding: 10px 12px;
-  background: rgba(78, 205, 196, 0.06);
-  border: 1px solid rgba(78, 205, 196, 0.15);
+  background: rgba(78, 205, 196, 0.08);
+  border: 1px solid rgba(78, 205, 196, 0.18);
   border-radius: var(--radius-sm);
 }
 
@@ -136,7 +137,7 @@
 .sidebar-db-name {
   font-size: 12px;
   font-weight: 600;
-  color: var(--text-primary);
+  color: rgba(255,255,255,0.9);
 }
 
 .sidebar-db-status {
@@ -166,8 +167,8 @@
   align-items: center;
   gap: 10px;
   padding: 10px 12px;
-  background: rgba(255,255,255,0.03);
-  border: 1px solid var(--border-color);
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.10);
   border-radius: var(--radius-sm);
 }
 
@@ -193,7 +194,7 @@
 .sidebar-user-name {
   font-size: 13px;
   font-weight: 600;
-  color: var(--text-primary);
+  color: rgba(255,255,255,0.92);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -201,7 +202,7 @@
 
 .sidebar-user-email {
   font-size: 10px;
-  color: var(--text-muted);
+  color: rgba(255,255,255,0.62);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -217,7 +218,7 @@
 .sidebar-logout-btn {
   background: none;
   border: none;
-  color: var(--text-muted);
+  color: rgba(255,255,255,0.62);
   cursor: pointer;
   padding: 6px;
   border-radius: 6px;

@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const api = axios.create({
-  baseURL: process.env.REACT_APP_API_URL || 'https://money-tracker-n1vp.onrender.com/api'
+  baseURL: import.meta.env.VITE_API_URL || "https://money-tracker-fxko.onrender.com/api"
 });
 
 api.interceptors.request.use((config) => {
